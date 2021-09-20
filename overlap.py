@@ -43,12 +43,20 @@ for i in range(1,50):
  
 def find_overlap(R, d):
     N_HV = round(2*(R/d))
+    
     Area = 0
+    
     for i in range(1,N_HV):
         for j in range(1,N_HV):
-            dij = sqrt((i*d)**2+(j*d)**2)
-            Area = Area + 2 * R**2 * math.acos(dij/(2*R))
-    return Area, dij
+            
+            di = ((i*d)**2+(j*d)**2)**(0.5)
+            
+            try:
+                Area = Area + (2 * (R**2) * math.acos(di/(2*R)))
+            except (ValueError):
+                continue
+            
+    return 4*Area
    
  
 
@@ -57,24 +65,27 @@ def cal_all(R,No):
    #d = 1 nm - 65 nm
    overlap_area = []
    ratio = []
-    for i in range(1,No):
-        d = i * 1e-9; 
-        overlap = find_overlap(R,d)
-        overlap_area.append(overlap[0])
-        ratio.append(overlap[1])
-        
+   for i in range(1,No):
+       d = i * 1e-9;
+       #print (d)
+       overlap = find_overlap(R,d)
+       #print (overlap)
+       if overlap != 0:
+           overlap_area.append((overlap/(3.14*R*R))+1)
+           ratio.append((d/R))
+    
       
-    return ratio, overlap_area
+   return ratio, overlap_area
   
-x, multi_fac = cal_all(62e-9, 65)
+x, multi_fac = cal_all(31e-9, 65)
 
 
 plt.plot(x,multi_fac, "o--", color = 'black', linewidth= 2)
 #plt.plot(Z_real,Z_imaginary,'o')
 #plt.xscale("log")
-#plt.yscale("log")
-plt.ylabel('Weight factor (k)',fontsize = 15)
-plt.xlabel('d/R',fontsize = 15)
+plt.yscale("log")
+plt.ylabel('Weight factor (k)',fontsize = 18)
+plt.xlabel('d/R',fontsize = 18)
 plt.yticks(fontsize=12)
 plt.xticks(fontsize=12)
 #plt.legend(["Data","Fit"], loc='upper left')
